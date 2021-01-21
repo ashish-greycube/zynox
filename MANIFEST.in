@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include zynox *.css
+recursive-include zynox *.csv
+recursive-include zynox *.html
+recursive-include zynox *.ico
+recursive-include zynox *.js
+recursive-include zynox *.json
+recursive-include zynox *.md
+recursive-include zynox *.png
+recursive-include zynox *.py
+recursive-include zynox *.svg
+recursive-include zynox *.txt
+recursive-exclude zynox *.pyc
