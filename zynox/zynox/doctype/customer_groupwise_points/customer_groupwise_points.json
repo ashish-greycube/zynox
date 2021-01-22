@@ -1,0 +1,38 @@
+{
+ "creation": "2021-01-22 15:38:43.637909",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "customer_group",
+  "qty_to_point_conversion"
+ ],
+ "fields": [
+  {
+   "fieldname": "customer_group",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Customer Group",
+   "options": "Customer Group",
+   "reqd": 1
+  },
+  {
+   "fieldname": "qty_to_point_conversion",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "How many Qty in sales_uom = 1 Point",
+   "reqd": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2021-01-22 15:38:43.637909",
+ "modified_by": "Administrator",
+ "module": "Zynox",
+ "name": "Customer Groupwise Points",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
