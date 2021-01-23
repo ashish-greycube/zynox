@@ -64,13 +64,14 @@ def get_data(filters):
     invoices = frappe.db.sql(
         """
         select 
-            si.sales_partner, si.name sales_invoice, sit.base_net_amount sales_amount,
+            si.sales_partner, si.name sales_invoice, sum(sit.base_net_amount) sales_amount,
             0 cogs, 0 expenses_wo_bonus, 0 bonus, 0 total_expense, 0 profit
         from 
             `tabSales Invoice` si
         inner join 
             `tabSales Invoice Item` sit on sit.parent = si.name
             {where_conditions}
+        group by si.sales_partner, si.name
         """.format(
             where_conditions=get_conditions(filters)
         ),

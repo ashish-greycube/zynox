@@ -29,6 +29,7 @@ def get_columns(filters):
             dict(label="Item Code", fieldname="item_code", width=160,),
             dict(label="Item Name", fieldname="item_name", width=160,),
             dict(label="Qty", fieldname="qty", fieldtype="Float", width=90,),
+            dict(label="Sales UOM", fieldname="sales_uom", fieldtype="Data", width=90,),
             dict(
                 label="Sales Amount",
                 fieldname="sales_amount",
@@ -68,7 +69,8 @@ def get_data(filters):
         """
     with fn_comm as
     (
-        select icgc.customer_group, icgc.item item_code, sd.from, sd.to, sd.commission_percent, icgc.default_sales_uom
+        select icgc.customer_group, icgc.item item_code, sd.from, 
+        sd.to, sd.commission_percent, icgc.default_sales_uom
         from `tabItem Customer Group Commission` icgc
         inner join `tabItem Customer Group Commission Slab Detail` sd on sd.parent = icgc.name
     ),
@@ -76,7 +78,8 @@ def get_data(filters):
     (
         select si.sales_partner, cus.customer_group, sit.parent, sit.item_code, sit.item_name,
         sum(sit.base_net_amount) sales_amount,
-        sum(round(sit.qty * sale_ucd.conversion_factor/default_sales_ucd.conversion_factor,2)) qty
+        sum(round(sit.qty * sale_ucd.conversion_factor/default_sales_ucd.conversion_factor,2)) qty,
+        it.sales_uom
         from `tabSales Invoice` si 
         inner join `tabSales Invoice Item` sit on sit.parent = si.name
         inner join tabItem it on it.item_code = sit.item_code
@@ -86,7 +89,7 @@ def get_data(filters):
         {where_conditions}
         group by si.sales_partner, cus.customer_group, sit.parent, sit.item_code, sit.item_name
     )
-    select fn_sales.sales_partner, fn_sales.item_code, fn_sales.item_name,
+    select fn_sales.sales_partner, fn_sales.item_code, fn_sales.item_name, fn_sales.sales_uom,
     sum(fn_sales.qty) qty, sum(fn_sales.sales_amount) sales_amount,
     coalesce(fn_comm.commission_percent,0) commission_percent,
     round(sum(coalesce(fn_comm.commission_percent,0) * fn_sales.sales_amount * .01),2) commission_amount
@@ -94,7 +97,7 @@ def get_data(filters):
     left outer join fn_comm on fn_comm.customer_group = fn_sales.customer_group 
     and fn_comm.item_code = fn_sales.item_code
     and fn_sales.qty BETWEEN fn_comm.from and fn_comm.to
-    group by fn_sales.sales_partner, fn_sales.item_code, fn_sales.item_name, fn_comm.commission_percent
+    group by fn_sales.sales_partner, fn_sales.item_code, fn_sales.item_name, fn_sales.sales_uom, fn_comm.commission_percent
 """.format(
             where_conditions=get_conditions(filters)
         ),
