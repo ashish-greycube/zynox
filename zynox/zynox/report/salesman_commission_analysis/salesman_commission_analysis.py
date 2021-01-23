@@ -66,33 +66,36 @@ def get_data(filters):
 
     data = frappe.db.sql(
         """
-    with fn as
+    with fn_comm as
     (
-        select c.name customer, icgc.item, sd.from, sd.to, sd.commission_percent, icgc.default_sales_uom
+        select icgc.customer_group, icgc.item item_code, sd.from, sd.to, sd.commission_percent, icgc.default_sales_uom
         from `tabItem Customer Group Commission` icgc
         inner join `tabItem Customer Group Commission Slab Detail` sd on sd.parent = icgc.name
-        inner join tabCustomer c on c.customer_group = icgc.customer_group
     ),
-    fn2 as
+    fn_sales as
     (
-        select si.sales_partner, sit.item_code, sit.item_name, 
-        sit.qty * ifnull(ucd.conversion_factor,1) qty, 
-        sit.base_net_amount sales_amount, fn.commission_percent,
-        fn.commission_percent * sit.base_net_amount * ifnull(ucd.conversion_factor,1) *.01 commission_amount
-        from `tabSales Invoice` si
+        select si.sales_partner, cus.customer_group, sit.parent, sit.item_code, sit.item_name,
+        sum(sit.base_net_amount) sales_amount,
+        sum(round(sit.qty * sale_ucd.conversion_factor/default_sales_ucd.conversion_factor,2)) qty
+        from `tabSales Invoice` si 
         inner join `tabSales Invoice Item` sit on sit.parent = si.name
-        left outer join fn on fn.customer = si.customer and sit.qty BETWEEN fn.from and fn.to
-        left outer join `tabUOM Conversion Detail` ucd on sit.uom <> fn.default_sales_uom and sit.uom = ucd.uom
+        inner join tabItem it on it.item_code = sit.item_code
+        inner join `tabUOM Conversion Detail` sale_ucd on sale_ucd.parent = sit.item_code and sale_ucd.uom = sit.uom
+        inner join `tabUOM Conversion Detail` default_sales_ucd on default_sales_ucd.parent = sit.item_code and default_sales_ucd.uom = it.sales_uom
+        inner join tabCustomer cus on cus.name = si.customer 
         {where_conditions}
+        group by si.sales_partner, cus.customer_group, sit.parent, sit.item_code, sit.item_name
     )
-    select
-        fn2.sales_partner, fn2.item_code, fn2.item_name, sum(fn2.qty) qty,
-        sum(fn2.sales_amount) sales_amount, max(fn2.commission_percent) commission_percent,
-        sum(fn2.commission_amount) commission_amount
-    from 
-        fn2
-    group by
-        fn2.sales_partner, fn2.item_code, fn2.item_name""".format(
+    select fn_sales.sales_partner, fn_sales.item_code, fn_sales.item_name,
+    sum(fn_sales.qty) qty, sum(fn_sales.sales_amount) sales_amount,
+    coalesce(fn_comm.commission_percent,0) commission_percent,
+    round(sum(coalesce(fn_comm.commission_percent,0) * fn_sales.sales_amount * .01),2) commission_amount
+    from fn_sales
+    left outer join fn_comm on fn_comm.customer_group = fn_sales.customer_group 
+    and fn_comm.item_code = fn_sales.item_code
+    and fn_sales.qty BETWEEN fn_comm.from and fn_comm.to
+    group by fn_sales.sales_partner, fn_sales.item_code, fn_sales.item_name, fn_comm.commission_percent
+""".format(
             where_conditions=get_conditions(filters)
         ),
         filters,
