@@ -21,12 +21,12 @@ def get_data():
             "items": [
                 {
                     "type": "report",
-                    "name": "SalesMan Commission Report",
-                    "label": "SalesMan Commission Report",
+                    "name": "SalesMan Commission Analysis",
+                    "label": "SalesMan Commission Analysis",
                     "is_query_report": True,
                     "doctype": "Sales Invoice",
-                    "description": "SalesMan Commission Report",
-                    "route": "#query-report/SalesMan Commission Report",
+                    "description": "SalesMan Commission Analysis",
+                    "route": "#query-report/SalesMan Commission Analysis",
                 },
                 {
                     "type": "report",
