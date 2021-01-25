@@ -18,28 +18,47 @@ def execute(filters=None):
 
 def get_columns(filters):
     return [
-        dict(label="Salesman", fieldname="sales_partner", width=160,),
+        dict(
+            label="Salesman",
+            fieldname="sales_partner",
+            width=160,
+        ),
         dict(
             label="Sales Amount",
             fieldname="sales_amount",
             fieldtype="Currency",
             width=100,
         ),
-        dict(label="COGS", fieldname="cogs", fieldtype="Currency", width=100,),
+        dict(
+            label="COGS",
+            fieldname="cogs",
+            fieldtype="Currency",
+            width=100,
+        ),
         dict(
             label="Expense W/O Bonus",
             fieldname="expense_wo_bonus",
             fieldtype="Currency",
             width=100,
         ),
-        dict(label="Bonus", fieldname="bonus", fieldtype="Currency", width=100,),
+        dict(
+            label="Bonus",
+            fieldname="bonus",
+            fieldtype="Currency",
+            width=100,
+        ),
         dict(
             label="Total Expense",
             fieldname="total_expense",
             fieldtype="Currency",
             width=160,
         ),
-        dict(label="Profit", fieldname="profit", fieldtype="Currency", width=160,),
+        dict(
+            label="Profit",
+            fieldname="profit",
+            fieldtype="Currency",
+            width=160,
+        ),
     ]
 
 
@@ -115,7 +134,9 @@ def get_data(filters):
     df = pandas.DataFrame.from_records(invoices)
     df1 = pandas.pivot_table(
         df,
-        index=["sales_partner",],
+        index=[
+            "sales_partner",
+        ],
         values=[
             "sales_amount",
             "cogs",
@@ -141,7 +162,8 @@ def get_data(filters):
             d.get("cogs", 0) + d.get("expense_wo_bonus", 0) + d.get("bonus", 0)
         )
         d["profit"] = d.get("sales_amount", 0) - d.get("total_expense", 0)
-
+        if not d.get("expense_wo_bonus"):
+            d["expense_wo_bonus"] = 0
     return data
 
 

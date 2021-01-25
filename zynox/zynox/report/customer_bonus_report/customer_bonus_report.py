@@ -44,10 +44,29 @@ def get_columns(filters):
                 options="Item",
                 width=200,
             ),
-            dict(label="Item Name", fieldname="item_name", width=200,),
-            dict(label="Qty", fieldname="qty", fieldtype="Float", width=90,),
-            dict(label="Sales UOM", fieldname="sales_uom", fieldtype="Data", width=90,),
-            dict(label="Points", fieldname="points", fieldtype="Float", width=90,),
+            dict(
+                label="Item Name",
+                fieldname="item_name",
+                width=200,
+            ),
+            dict(
+                label="Qty",
+                fieldname="qty",
+                fieldtype="Float",
+                width=90,
+            ),
+            dict(
+                label="Sales UOM",
+                fieldname="sales_uom",
+                fieldtype="Data",
+                width=90,
+            ),
+            dict(
+                label="Points",
+                fieldname="points",
+                fieldtype="Float",
+                width=90,
+            ),
             # dict(label="Sales Partner", fieldname="sales_partner", width=120),
         ]
 
@@ -80,7 +99,7 @@ def get_data(filters):
             (
                 select si.sales_partner, si.customer, cus.customer_group, cus.territory, cus.country_cf,
                 sit.item_code, sit.item_name, it.sales_uom,
-                sum(round(sit.qty * sale_ucd.conversion_factor/default_sales_ucd.conversion_factor,2)) qty
+                sum(FLOOR(sit.qty * sale_ucd.conversion_factor/default_sales_ucd.conversion_factor)) qty
                 from `tabSales Invoice` si 
                 inner join `tabSales Invoice Item` sit on sit.parent = si.name
                 inner join tabItem it on it.item_code = sit.item_code
