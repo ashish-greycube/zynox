@@ -19,15 +19,16 @@
   },
   {
    "columns": 4,
+   "default": "1",
    "fieldname": "qty_to_point_conversion",
    "fieldtype": "Int",
    "in_list_view": 1,
-   "label": "How many Qty in sales_uom = 1 Point",
+   "label": "How many points per sales_uom ?",
    "reqd": 1
   }
  ],
  "istable": 1,
- "modified": "2021-01-22 15:46:35.566444",
+ "modified": "2021-01-25 10:27:46.513715",
  "modified_by": "Administrator",
  "module": "Zynox",
  "name": "Customer Groupwise Points",

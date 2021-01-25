@@ -92,7 +92,7 @@ def get_data(filters):
             )
             select fn_sales.customer, fn_sales.item_code, fn_sales.item_name, fn_sales.sales_uom,
             sum(fn_sales.qty) qty,
-            sum(case when cgp.qty_to_point_conversion is null then 0 else round(qty/cgp.qty_to_point_conversion,2) end) points,
+            sum(case when cgp.qty_to_point_conversion is null then 0 else round(qty*cgp.qty_to_point_conversion,2) end) points,
             fn_sales.sales_partner, fn_sales.customer_group, fn_sales.territory, fn_sales.country_cf
             from fn_sales
             left outer join `tabCustomer Groupwise Points` cgp on cgp.parent = fn_sales.item_code 
