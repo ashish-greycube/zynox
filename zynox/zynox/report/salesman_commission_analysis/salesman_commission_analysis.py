@@ -83,7 +83,7 @@ def get_columns(filters):
 
 
 def get_conditions(filters):
-    where_clause = []
+    where_clause = ["si.docstatus = 1"]
     if filters.get("from_date"):
         where_clause.append("si.posting_date >= %(from_date)s")
     if filters.get("to_date"):
@@ -128,7 +128,8 @@ def get_data(filters):
     left outer join fn_comm on fn_comm.customer_group = fn_sales.customer_group 
     and fn_comm.item_code = fn_sales.item_code
     and fn_sales.qty BETWEEN fn_comm.from and fn_comm.to
-    group by fn_sales.sales_partner, fn_sales.item_code, fn_sales.item_name, fn_sales.sales_uom, fn_comm.commission_percent
+    group by fn_sales.sales_partner, fn_sales.item_code, fn_sales.item_name, 
+    fn_sales.sales_uom, fn_comm.commission_percent, fn_sales.customer_group
 """.format(
             where_conditions=get_conditions(filters)
         ),
