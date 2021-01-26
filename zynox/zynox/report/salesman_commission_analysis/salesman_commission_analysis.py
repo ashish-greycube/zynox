@@ -15,7 +15,11 @@ def execute(filters=None):
 def get_columns(filters):
     if filters.get("show_summary"):
         return [
-            dict(label="Salesman", fieldname="sales_partner", width=160,),
+            dict(
+                label="Salesman",
+                fieldname="sales_partner",
+                width=160,
+            ),
             dict(
                 label="Commission",
                 fieldname="commission_amount",
@@ -25,15 +29,42 @@ def get_columns(filters):
         ]
     else:
         return [
-            dict(label="Salesman", fieldname="sales_partner", width=160,),
-            dict(label="Item Code", fieldname="item_code", width=160,),
-            dict(label="Item Name", fieldname="item_name", width=160,),
-            dict(label="Qty", fieldname="qty", fieldtype="Float", width=90,),
-            dict(label="Sales UOM", fieldname="sales_uom", fieldtype="Data", width=90,),
+            dict(
+                label="Salesman",
+                fieldname="sales_partner",
+                width=160,
+            ),
+            dict(
+                label="Item Code",
+                fieldname="item_code",
+                width=160,
+            ),
+            dict(
+                label="Item Name",
+                fieldname="item_name",
+                width=160,
+            ),
+            dict(
+                label="Qty",
+                fieldname="qty",
+                fieldtype="Float",
+                width=90,
+            ),
+            dict(
+                label="Sales UOM",
+                fieldname="sales_uom",
+                fieldtype="Data",
+                width=90,
+            ),
             dict(
                 label="Sales Amount",
                 fieldname="sales_amount",
                 fieldtype="Currency",
+                width=110,
+            ),
+            dict(
+                label="Customer Group",
+                fieldname="customer_group",
                 width=110,
             ),
             dict(
@@ -76,7 +107,7 @@ def get_data(filters):
     ),
     fn_sales as
     (
-        select si.sales_partner, cus.customer_group, sit.parent, sit.item_code, sit.item_name,
+        select si.sales_partner, cus.customer_group, sit.item_code, sit.item_name,
         sum(sit.base_net_amount) sales_amount,
         sum(round(sit.qty * sale_ucd.conversion_factor/default_sales_ucd.conversion_factor,2)) qty,
         it.sales_uom
@@ -87,9 +118,9 @@ def get_data(filters):
         inner join `tabUOM Conversion Detail` default_sales_ucd on default_sales_ucd.parent = sit.item_code and default_sales_ucd.uom = it.sales_uom
         inner join tabCustomer cus on cus.name = si.customer 
         {where_conditions}
-        group by si.sales_partner, cus.customer_group, sit.parent, sit.item_code, sit.item_name
+        group by si.sales_partner, cus.customer_group, sit.item_code, sit.item_name
     )
-    select fn_sales.sales_partner, fn_sales.item_code, fn_sales.item_name, fn_sales.sales_uom,
+    select fn_sales.sales_partner, fn_sales.customer_group, fn_sales.item_code, fn_sales.item_name, fn_sales.sales_uom,
     sum(fn_sales.qty) qty, sum(fn_sales.sales_amount) sales_amount,
     coalesce(fn_comm.commission_percent,0) commission_percent,
     round(sum(coalesce(fn_comm.commission_percent,0) * fn_sales.sales_amount * .01),2) commission_amount
@@ -114,4 +145,3 @@ def get_data(filters):
         data = sorted(data, key=itemgetter("sales_partner"))
 
     return data
-
