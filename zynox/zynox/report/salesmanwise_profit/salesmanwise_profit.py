@@ -114,9 +114,9 @@ def get_data(filters):
     for idx, col in enumerate(columns):
         if not isinstance(col, str):
             continue
-        if col.startswith("Sales Invoice:"):
+        if _("Sales Invoice") in col:
             invoice_idx = idx
-        elif col.startswith("Buying Amount:"):
+        elif _("Buying Amount") in col:
             buying_amount_idx = idx
 
     if invoice_idx < 0 or buying_amount_idx < 0:
