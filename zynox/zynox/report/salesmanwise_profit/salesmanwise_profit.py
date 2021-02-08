@@ -107,6 +107,9 @@ def get_data(filters):
     filters.group_by = "Invoice"
     columns, gross_profit = get_gross_profit(filters)
 
+    if not gross_profit:
+        return []
+
     invoice_idx, buying_amount_idx = -1, -1
     for idx, col in enumerate(columns):
         if not isinstance(col, str):
