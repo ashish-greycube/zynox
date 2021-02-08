@@ -99,6 +99,9 @@ def get_data(filters):
         # debug=True,
     )
 
+    if not invoices:
+        return []
+
     # Uses ERPNext 'Gross Profit' report for buying_amount as COGS
     from erpnext.accounts.report.gross_profit.gross_profit import (
         execute as get_gross_profit,
@@ -135,6 +138,7 @@ def get_data(filters):
             inv.cogs = d.get("buying_amount", 0)
 
     df = pandas.DataFrame.from_records(invoices)
+
     df1 = pandas.pivot_table(
         df,
         index=[
